@@ -1,0 +1,12 @@
+python-chess
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+tensorflow
+tqdm
+requests
+flask
+pytest
+
