@@ -131,7 +131,10 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 - Chess.js library contributors
 
 ## References
-- Chess Vision Recognition: [relevant papers/links]
-- Stockfish Documentation: [link]
-- CNN Architectures: [relevant papers]
-- Chess Position Analysis: [relevant papers]
+## References
+
+- [Neural Chessboard](https://arxiv.org/pdf/1708.03898.pdf) - Board detection implementation
+- [ChessVision Tutorial](https://tech.bakkenbaeck.com/post/chessvision) - Vision system guide
+- [Stockfish Documentation](https://stockfishchess.org/doc/) - Chess engine integration
+- [Python-Chess Library](https://python-chess.readthedocs.io/) - Chess tools in Python
+- [UCI Protocol](http://wbec-ridderkerk.nl/html/UCIProtocol.html) - Engine communication standard
