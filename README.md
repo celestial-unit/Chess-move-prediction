@@ -1,3 +1,5 @@
+![Example Image](ies.png)
+
 # Chess Vision and Move Prediction
 
 A computer vision project that combines chess position recognition with intelligent move prediction using Stockfish engine.
