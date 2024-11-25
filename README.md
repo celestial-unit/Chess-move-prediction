@@ -130,8 +130,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 - Chess.js library contributors
 
 ## References
-## References
-
 - [Neural Chessboard](https://arxiv.org/pdf/1708.03898.pdf) - Board detection implementation
 - [ChessVision Tutorial](https://tech.bakkenbaeck.com/post/chessvision) - Vision system guide
 - [Stockfish Documentation](https://stockfishchess.org/doc/) - Chess engine integration
