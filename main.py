@@ -83,12 +83,9 @@ def enforce_chess_rules(board):
     
     return board
 
-def board_to_fen(board):
+def board_to_fen(board, castling_rights='KQkq', en_passant='-', halfmove=0, fullmove=1, capture_info=None):
     try:
-        # Normalize and validate board
-        board = enforce_chess_rules(board)
-        
-        # FEN conversion with error handling
+        # Existing board conversion logic
         fen_parts = []
         for row in board:
             empty_count = 0
@@ -109,68 +106,56 @@ def board_to_fen(board):
             fen_parts.append(''.join(row_fen))
         
         fen = '/'.join(fen_parts)
-        fen += ' w KQkq - 0 1'
         
-        return fen
+        # Added capture_info to the return object
+        return {
+            'fen': f"{fen} w {castling_rights} {en_passant} {halfmove} {fullmove}",
+            'castling_rights': castling_rights,
+            'capture_square': capture_info.get('capture_square') if capture_info else None,
+            'captured_piece': capture_info.get('captured_piece') if capture_info else None
+        }
     except Exception as e:
         print(f"FEN conversion error: {e}")
         return None
+stockfish_paths = [
+    "/usr/games/stockfish", 
+    "/usr/local/bin/stockfish", 
+    "/snap/bin/stockfish", 
+    "/usr/bin/stockfish", 
+    "stockfish"
+]
 def get_best_move(fen):
-    """Robust Stockfish move retrieval with extensive error handling"""
-    import traceback
-    import chess
-    import chess.engine
-    import os
-
     try:
-        # Validate FEN
+        # If fen is a dictionary, extract the FEN string
+        if isinstance(fen, dict):
+            fen = fen['fen']
+        
         board = chess.Board(fen)
-        print("Validated Board Representation:")
-        print(board)
-
-        # Find Stockfish executable with expanded paths
-        stockfish_paths = [
-            "/usr/games/stockfish",
-            "/usr/local/bin/stockfish",
-            "/snap/bin/stockfish",
-            "/usr/bin/stockfish",
-            "stockfish"
-        ]
         
-        working_path = next((path for path in stockfish_paths if os.path.exists(path)), None)
-        
-        if not working_path:
+        stockfish_path = next((path for path in stockfish_paths if os.path.exists(path)), None)
+        if not stockfish_path:
             print("No Stockfish executable found")
             return None
 
-        # More comprehensive limit configurations
-        limit_configs = [
-            chess.engine.Limit(depth=15, time=5.0),  # Increased depth and time
-            chess.engine.Limit(depth=10, time=2.0),
-            chess.engine.Limit(depth=5, time=1.0),
-            chess.engine.Limit(nodes=20000)
-        ]
+        with chess.engine.SimpleEngine.popen_uci(stockfish_path) as engine:
+            result = engine.play(board, chess.engine.Limit(depth=15))
+            move = result.move
+            
+            # Detailed capture and game state information
+            capture_info = {
+                'is_capture': board.is_capture(move),
+                'capture_square': chess.square_name(move.to_square) if board.is_capture(move) else None,
+                'captured_piece': str(board.piece_at(move.to_square)) if board.is_capture(move) else None,
+                'is_checkmate': board.is_checkmate(),
+                'is_check': board.is_check()
+            }
+            
+            return move, capture_info
 
-        for limit in limit_configs:
-            try:
-                with chess.engine.SimpleEngine.popen_uci(working_path) as engine:
-                    result = engine.play(board, limit)
-                    return result.move
-            except Exception as config_error:
-                print(f"Failed with limit {limit}: {config_error}")
-                continue
-
-        print("All Stockfish move retrieval attempts failed")
-        return None
-
-    except chess.BoardError as board_error:
-        print(f"Invalid board configuration: {board_error}")
     except Exception as e:
-        print(f"Unexpected error in get_best_move: {e}")
-        traceback.print_exc()
+        print(f"Move analysis error: {e}")
+        return None
     
-    return None
-
 def main(image_path):
     # Declare model as global
     global model
